@@ -1,0 +1,14 @@
+[
+    {
+        "input" : {"image": "displacement field", "calculate": "traction field"},
+        "output" :["image process displacement", "calculate displacement", "calculate traction"]
+    },
+    {
+        "input" : {"array": "displacement field", "calculate": "traction field"},
+        "output" :["calculate displacement", "calculate traction"]
+    },
+    {
+        "input" : {"image": ["bead image previous", "bead image next"], "calculate": "traction field"},
+        "output" :["image process beads", "calculate displacement", "calculate traction"]
+    }
+]
