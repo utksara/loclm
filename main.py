@@ -1,14 +1,13 @@
-import numpy as np
+from loclm.models import *
+                              
+input_sentances = ["calculate traction field from displacement image img1.png"]
 
-passage = " simulate cell 1 and cell 2 such that they are \
-nearby to each other wish a distance of 2 mm"
+def sentence_to_sequence(sentance):
+    sen2Qrymodel = Sen2Qrymodel()
+    qry2Seqmodel = Qry2Seqmodel()
+    query = sen2Qrymodel.predict(sentance)
+    sqnce = qry2Seqmodel.predict(query)
+    return sqnce
 
-unique_token = set()
-
-action_sequence = {}
-
-tokens = passage.split()
-
-for token in tokens:
-    unique_token.add(token)
-    
+for sentance in input_sentances:
+    print("\n sentance :", sentance, "\nfetched sequence : ", sentence_to_sequence(sentance))

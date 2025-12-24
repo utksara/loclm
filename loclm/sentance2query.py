@@ -1,7 +1,7 @@
 import numpy as np
 import json
 import re
-
+import pickle
 class FastKernelRouter:
     def __init__(self, token_set, prefix_set):
         self.tags = [t.lower() for t in token_set]
@@ -92,7 +92,7 @@ class FastKernelRouter:
                 avg_loss = total_loss / (len(training_data) * len(self.prefixes))
                 print(f"Epoch {epoch:4d} | Avg Log-Loss: {avg_loss:.6f}")
 
-    def predict(self, sentence, template):
+    def predict(self, sentence, template = {}):
         
         sentence = sentence.lower()
         pos_prefix = np.array([self._get_pos(sentence, k) for k in self.prefixes])
@@ -124,31 +124,36 @@ class FastKernelRouter:
         return result
 # --- Setup Data ---
 
-token_set = ["traction", "bead image previous", "bead image next", "displacement", "bead image", "from", "the", "with", "as", "and", "provided", "uploaded"]
-prefix_set = ["image", "array", "calculate"]
-# aux_tokens = ["from", "the", "with", "as", "and", "provided", "uploaded"]
+if __name__ == "__main__":
+    token_set = ["traction", "bead image previous", "bead image next", "displacement", "bead image", "from", "the", "with", "as", "and", "provided", "uploaded"]
+    prefix_set = ["image", "array", "calculate"]
+    # aux_tokens = ["from", "the", "with", "as", "and", "provided", "uploaded"]
 
-# Example Training Dataset
-training_data = []
-with open("s2qdata/training_set.json", "r") as f:
-    data = json.load(f)
-    for entry in data:
-        training_data.append((
-            entry["input"],
-            entry["output"]
-        ))
+    # Example Training Dataset
+    training_data = []
+    with open("s2qdata/training_set.json", "r") as f:
+        data = json.load(f)
+        for entry in data:
+            training_data.append((
+                entry["input"],
+                entry["output"]
+            ))
 
-# --- Execution ---
+    # --- Execution ---
 
-model = FastKernelRouter(token_set, prefix_set)
-model.train(training_data, epochs=5000)
+    model = FastKernelRouter(token_set, prefix_set)
+    model.train(training_data, epochs=5000)
 
-# Test the model
-with open("s2qdata/test_set.json", "r") as f:
-    data = json.load(f)
-    for entry in data:
-        test_input = entry["input"]
-        output_query = model.predict(test_input, {})
-        print("\nInput Sentence:", test_input)
-        print("Predict Query:", output_query)
-        print("Actual  Query:", entry["output"])
+    # Save (Serialize) to a file
+    with open('s2qmodel.pkl', 'wb') as file:
+        pickle.dump(model, file)
+
+    # Test the model
+    with open("s2qdata/test_set.json", "r") as f:
+        data = json.load(f)
+        for entry in data:
+            test_input = entry["input"]
+            output_query = model.predict(test_input)
+            print("\nInput Sentence:", test_input)
+            print("Predict Query:", output_query)
+            print("Actual  Query:", entry["output"])

@@ -1,5 +1,6 @@
 import numpy as np
 import json 
+import pickle
 
 class ContextSequenceLearner:
     def __init__(self, graph, all_tokens):
@@ -109,37 +110,41 @@ class ContextSequenceLearner:
             
             if epoch % 50 == 0: print(f"Epoch {epoch}, Loss: {loss[0]:.4f}")
 # --- Execution ---
+if __name__ == "__main__":
+    G = {
+        "image process displacement": ["calculate displacement"],
+        "image process beads": ["calculate displacement"],
+        "calculate displacement": ["calculate traction"]
+    }
 
-G = {
-    "image process displacement": ["calculate displacement"],
-    "image process beads": ["calculate displacement"],
-    "calculate displacement": ["calculate traction"]
-}
+    # All unique tokens in the system
+    tokens = {"image", "calculate displacement", "query", "traction field", 
+            "image process displacement", "image process beads", "calculate traction"}
 
-# All unique tokens in the system
-tokens = {"image", "calculate displacement", "query", "traction field", 
-          "image process displacement", "image process beads", "calculate traction"}
-
-# Example Training Data (Tree T, Sequence S)
-train_set = []
-with open("q2sdata/training_set.json",  "r") as f:
-    data = json.load(f)
-    for entry in data:
-        train_set.append((
-            entry["input"],
-            entry["output"]
-        ))
+    # Example Training Data (Tree T, Sequence S)
+    train_set = []
+    with open("q2sdata/training_set.json",  "r") as f:
+        data = json.load(f)
+        for entry in data:
+            train_set.append((
+                entry["input"],
+                entry["output"]
+            ))
 
 
-model = ContextSequenceLearner(G, tokens)
-model.train(train_set, epochs=1000)
+    model = ContextSequenceLearner(G, tokens)
+    model.train(train_set, epochs=1000)
 
-# Prediction
-with open("q2sdata/test_set.json", "r") as f:
-    data = json.load(f)
-    for entry in data:
-        T_query = entry["input"]
-        predicted_sequence = model.predict(T_query)
-        print(f"\nInput query: {T_query}")
-        print(f"Predict Seq: {predicted_sequence}")
-        print(f"Actual  Seq: {entry["output"]}")
+    # Save (Serialize) to a file
+    with open('q2smodel.pkl', 'wb') as file:
+        pickle.dump(model, file)
+
+    # Prediction
+    with open("q2sdata/test_set.json", "r") as f:
+        data = json.load(f)
+        for entry in data:
+            T_query = entry["input"]
+            predicted_sequence = model.predict(T_query)
+            print(f"\nInput query: {T_query}")
+            print(f"Predict Seq: {predicted_sequence}")
+            print(f"Actual  Seq: {entry["output"]}")
