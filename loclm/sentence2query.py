@@ -13,7 +13,10 @@ class FastKernelRouter:
         # Kernel: Pos_Val, Pos_Key, Pos_Aux, Dist(Val, Key)
         # Added distance as a feature to improve precision
         self.W_kernel = np.random.randn(4, 1) * 0.05
-        self.b = 0.0
+        self.b_kernel = 0.0
+        
+        self.W_tagsize = np.random.randn(4, 1) * 0.05
+        self.b_tagsize = 0.0
 
     def _get_pos(self, sentence, target):
         try:
@@ -34,7 +37,7 @@ class FastKernelRouter:
         return 1 / (1 + np.exp(-np.clip(x, -15, 15)))
     
     def forward(self, feat, v_idx, k_idx):
-        score = np.dot(self.W_kernel.T, feat) + self.W_semantic[v_idx, k_idx] + self.b
+        score = np.dot(self.W_kernel.T, feat) + self.W_semantic[v_idx, k_idx] + self.b_kernel
         prob = self._sigmoid(score)[0,0]
         return prob
     
@@ -80,7 +83,7 @@ class FastKernelRouter:
                         
                         # Update Kernel Weights
                         self.W_kernel -= lr * error * feat
-                        self.b -= lr * error
+                        self.b_kernel -= lr * error
                         
                         # Update Semantic Weights
                         self.W_semantic[v_idx, k_idx] -= lr * error

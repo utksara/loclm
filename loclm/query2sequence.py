@@ -118,7 +118,7 @@ if __name__ == "__main__":
     }
 
     # All unique tokens in the system
-    tokens = {"image", "calculate displacement", "query", "traction field", 
+    tokens = {"image", "calculate displacement", "query", "traction", 
             "image process displacement", "image process beads", "calculate traction"}
 
     # Example Training Data (Tree T, Sequence S)

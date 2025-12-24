@@ -1,5 +1,5 @@
 from loclm.query2sequence import *
-from loclm.sentance2query import *
+from loclm.sentence2query import *
 
 import pickle
 class Model():
@@ -12,12 +12,14 @@ class Model():
         return model.predict(inputqry)
     
 class Qry2Seqmodel(Model):
-    def __init__(self):
-        self.pklfile = 'loclm/q2smodel.pkl'
+    def __init__(self, model_name):
+        if model_name == 'cellmech':
+            self.pklfile = 'loclm/q2smodel.pkl'
         
 class Sen2Qrymodel(Model):
-    def __init__(self):
-        self.pklfile = 'loclm/s2qmodel.pkl'
+    def __init__(self, model_name):
+        if model_name == 'cellmech':
+            self.pklfile = 'loclm/s2qmodel.pkl'
     
 # with open('q2smodel.pkl', 'rb') as file:
 #     q2smodel = pickle.load(file)
