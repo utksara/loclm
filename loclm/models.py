@@ -1,28 +1,40 @@
 from loclm.query2sequence import *
 from loclm.sentence2query import *
-
-import pickle
+import json
 class Model():
     def __init__(self):
-        self.pklfile = ""
+        self.filepath = ""
+        
+    def load(self):
+        pass
             
     def predict(self, inputqry):
-        with open(self.pklfile, 'rb') as file:
-            model = pickle.load(file)
+        model = self.load()
         return model.predict(inputqry)
     
 class Qry2Seqmodel(Model):
+            
     def __init__(self, model_name):
         if model_name == 'cellmech':
-            self.pklfile = 'loclm/q2smodel.pkl'
+            self.filepath = 'q2smodel.json'
+            
+    def load(self):
+        with resources.files('loclm').joinpath(self.filepath).open('rb') as f:
+            inputparams = json.load(f)
+            predictor = ContextSequenceLearner()
+            predictor.load(inputparams)
+            return predictor
         
 class Sen2Qrymodel(Model):
     def __init__(self, model_name):
         if model_name == 'cellmech':
-            self.pklfile = 'loclm/s2qmodel.pkl'
-    
-# with open('q2smodel.pkl', 'rb') as file:
-#     q2smodel = pickle.load(file)
-    
-# with open('s2qmodel.pkl', 'rb') as file:
-#     s2qmodel = pickle.load(file)
+            self.filepath = 's2qmodel.json'
+            
+    def load(self):
+        with resources.files('loclm').joinpath(self.filepath).open('rb') as f:
+            inputparams = json.load(f)
+            predictor = FastKernelRouter()
+            predictor.load(inputparams)
+            return predictor
+        
+        

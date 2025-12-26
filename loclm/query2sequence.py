@@ -1,20 +1,23 @@
 import numpy as np
-import json 
-import pickle
+import json
+from importlib import resources
 
 class ContextSequenceLearner:
-    def __init__(self, graph, all_tokens):
-        self.graph = graph
-        self.tokens = sorted(list(all_tokens))
-        self.token_to_idx = {t: i for i, t in enumerate(self.tokens)}
-        self.idx_to_token = {i: t for i, t in enumerate(self.tokens)}
+    
+    def __init__(self, graph = None, all_tokens = None):
         
-        # Dimensions
-        self.vocab_size = len(self.tokens)
-        # Weight Matrix: maps context+current_state to next_state
-        # We use (vocab_size * 2) because: [Context Vector ; Current State Vector]
-        self.W = np.random.randn(self.vocab_size, self.vocab_size * 2) * 0.1
-        self.b = np.zeros((self.vocab_size, 1))
+        if graph is not None and all_tokens is not None:
+            self.graph = graph
+            self.tokens = sorted(list(all_tokens))
+            self.token_to_idx = {t: i for i, t in enumerate(self.tokens)}
+            self.idx_to_token = {i: t for i, t in enumerate(self.tokens)}
+            
+            # Dimensions
+            self.vocab_size = len(self.tokens)
+            # Weight Matrix: maps context+current_state to next_state
+            # We use (vocab_size * 2) because: [Context Vector ; Current State Vector]
+            self.W = np.random.randn(self.vocab_size, self.vocab_size * 2) * 0.1
+            self.b = np.zeros((self.vocab_size, 1))
 
     def _get_context_vector(self, T):
         """Recursively flattens tree T into a multi-hot vector."""
@@ -33,6 +36,40 @@ class ContextSequenceLearner:
         e_x = np.exp(x - np.max(x))
         return e_x / e_x.sum(axis=0)
 
+
+    def train(self, training_pairs, epochs=200, lr=0.05):
+        for epoch in range(epochs):
+            loss = 0
+            for T, target_S in training_pairs:
+                context_vec = self._get_context_vector(T)
+                
+                # We train every transition in the sequence including the start
+                # Step 0: Context -> S[0]
+                # Step 1: Context + S[0] -> S[1] ...
+                for i in range(len(target_S)):
+                    if i == 0:
+                        prev_state = np.zeros((self.vocab_size, 1))
+                    else:
+                        prev_state = np.zeros((self.vocab_size, 1))
+                        prev_state[self.token_to_idx[target_S[i-1]]] = 1
+                    
+                    x = np.vstack((context_vec, prev_state))
+                    target_idx = self.token_to_idx[target_S[i]]
+                    
+                    # Forward
+                    probs = self.softmax(np.dot(self.W, x) + self.b)
+                    
+                    # Backprop
+                    y_true = np.zeros((self.vocab_size, 1))
+                    y_true[target_idx] = 1
+                    error = probs - y_true
+                    
+                    self.W -= lr * np.dot(error, x.T)
+                    self.b -= lr * error
+                    loss += -np.log(probs[target_idx] + 1e-9)
+            
+            if epoch % 50 == 0: print(f"Epoch {epoch}, Loss: {loss[0]:.4f}")
+            
     def predict(self, T):
         """Op(G, T) -> S. T is the only input."""
         context_vec = self._get_context_vector(T)
@@ -76,39 +113,33 @@ class ContextSequenceLearner:
             sequence.append(current_node)
             
         return sequence
-
-    def train(self, training_pairs, epochs=200, lr=0.05):
-        for epoch in range(epochs):
-            loss = 0
-            for T, target_S in training_pairs:
-                context_vec = self._get_context_vector(T)
-                
-                # We train every transition in the sequence including the start
-                # Step 0: Context -> S[0]
-                # Step 1: Context + S[0] -> S[1] ...
-                for i in range(len(target_S)):
-                    if i == 0:
-                        prev_state = np.zeros((self.vocab_size, 1))
-                    else:
-                        prev_state = np.zeros((self.vocab_size, 1))
-                        prev_state[self.token_to_idx[target_S[i-1]]] = 1
-                    
-                    x = np.vstack((context_vec, prev_state))
-                    target_idx = self.token_to_idx[target_S[i]]
-                    
-                    # Forward
-                    probs = self.softmax(np.dot(self.W, x) + self.b)
-                    
-                    # Backprop
-                    y_true = np.zeros((self.vocab_size, 1))
-                    y_true[target_idx] = 1
-                    error = probs - y_true
-                    
-                    self.W -= lr * np.dot(error, x.T)
-                    self.b -= lr * error
-                    loss += -np.log(probs[target_idx] + 1e-9)
-            
-            if epoch % 50 == 0: print(f"Epoch {epoch}, Loss: {loss[0]:.4f}")
+    
+    def load(self, param):
+        self.graph = param["graph"]
+        self.tokens = param["tokens"]
+        self.token_to_idx = param["token_to_idx"]
+        self.idx_to_token = {}
+        for key in param["idx_to_token"]:
+            self.idx_to_token[int(key)] = param["idx_to_token"][key]
+        self.vocab_size = param["vocab_size"]
+        self.W = np.array(param["W"])
+        self.b = np.array(param["b"])
+        print("pusheen when saveing tidx_to_tokenags  = ", self.idx_to_token)
+    
+    def save(self, filepath):
+        params = {
+                "W" : self.W.tolist(),
+                "b" : self.b.tolist(),
+                "graph" : self.graph,
+                "tokens" : self.tokens,
+                "token_to_idx" : self.token_to_idx,
+                "idx_to_token" : self.idx_to_token,
+                "vocab_size" : self.vocab_size
+            }
+        print("pusheen when saveing tidx_to_tokenags  = ", self.idx_to_token)
+        with open(filepath, 'w', encoding='utf-8') as json_file:
+            json.dump(params, json_file, indent=4)
+    
 # --- Execution ---
 if __name__ == "__main__":
     G = {
@@ -131,13 +162,9 @@ if __name__ == "__main__":
                 entry["output"]
             ))
 
-
     model = ContextSequenceLearner(G, tokens)
     model.train(train_set, epochs=1000)
-
-    # Save (Serialize) to a file
-    with open('q2smodel.pkl', 'wb') as file:
-        pickle.dump(model, file)
+    model.save('q2smodel.json')
 
     # Prediction
     with open("q2sdata/test_set.json", "r") as f:

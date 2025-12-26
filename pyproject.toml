@@ -1,6 +1,6 @@
 [project]
 name = "loclm"
-version = "0.1.1"
+version = "0.1.2"
 description = "localized language model specifically designed to be domain expert (instead of expert of everything) and very light weight"
 authors = [
     {name = "Utkarsh (saraswat.utk@gmail.com)"}

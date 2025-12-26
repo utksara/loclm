@@ -2,21 +2,24 @@ import numpy as np
 import json
 import re
 import pickle
+import json
+            
 class FastKernelRouter:
-    def __init__(self, token_set, prefix_set):
-        self.tags = [t.lower() for t in token_set]
-        self.prefixes = [k.lower() for k in prefix_set]
-        
-        # Semantic mapping: (Tokens x Keys)
-        self.W_semantic = np.random.randn(len(self.tags), len(self.prefixes)) * 0.05
-        
-        # Kernel: Pos_Val, Pos_Key, Pos_Aux, Dist(Val, Key)
-        # Added distance as a feature to improve precision
-        self.W_kernel = np.random.randn(4, 1) * 0.05
-        self.b_kernel = 0.0
-        
-        self.W_tagsize = np.random.randn(4, 1) * 0.05
-        self.b_tagsize = 0.0
+    def __init__(self, token_set = None, prefix_set = None):
+        if token_set is not None and prefix_set is not None:
+            self.tags = [t.lower() for t in token_set]
+            self.prefixes = [k.lower() for k in prefix_set]
+            
+            # Semantic mapping: (Tokens x Keys)
+            self.W_semantic = np.random.randn(len(self.tags), len(self.prefixes)) * 0.05
+            
+            # Kernel: Pos_Val, Pos_Key, Pos_Aux, Dist(Val, Key)
+            # Added distance as a feature to improve precision
+            self.W_kernel = np.random.randn(4, 1) * 0.05
+            self.b_kernel = 0.0
+            
+            self.W_tagsize = np.random.randn(4, 1) * 0.05
+            self.b_tagsize = 0.0
 
     def _get_pos(self, sentence, target):
         try:
@@ -95,8 +98,7 @@ class FastKernelRouter:
                 avg_loss = total_loss / (len(training_data) * len(self.prefixes))
                 print(f"Epoch {epoch:4d} | Avg Log-Loss: {avg_loss:.6f}")
 
-    def predict(self, sentence, template = {}):
-        
+    def predict(self, sentence): 
         sentence = sentence.lower()
         pos_prefix = np.array([self._get_pos(sentence, k) for k in self.prefixes])
         pos_tag = np.array([self._get_pos(sentence, v) for v in self.tags])
@@ -125,11 +127,32 @@ class FastKernelRouter:
                 result[key] = best_token
         # print(prob_matrix)
         return result
+    
+    def load(self, param):
+        self.W_kernel = np.array(param["W_kernel"])
+        self.b_kernel = np.array(param["b_kernel"])
+        self.tags = param["tags"]
+        self.prefixes = param["prefixes"]
+        self.W_semantic = np.array(param["W_semantic"])
+        
+    def save(self, filepath):
+        params = {
+                "W_kernel" : self.W_kernel.tolist(),
+                "b_kernel" : self.b_kernel.tolist(),
+                "tags" : self.tags,
+                "prefixes" : self.prefixes,
+                "W_semantic" : self.W_semantic.tolist()
+            }
+        with open(filepath, 'w', encoding='utf-8') as json_file:
+            json.dump(params, json_file, indent=4)
+    
 # --- Setup Data ---
 
 if __name__ == "__main__":
     token_set = ["traction", "bead image previous", "bead image next", "displacement", "bead image", "from", "the", "with", "as", "and", "provided", "uploaded"]
     prefix_set = ["image", "array", "calculate"]
+    
+    
     # aux_tokens = ["from", "the", "with", "as", "and", "provided", "uploaded"]
 
     # Example Training Dataset
@@ -146,10 +169,7 @@ if __name__ == "__main__":
 
     model = FastKernelRouter(token_set, prefix_set)
     model.train(training_data, epochs=5000)
-
-    # Save (Serialize) to a file
-    with open('s2qmodel.pkl', 'wb') as file:
-        pickle.dump(model, file)
+    model.save('s2qmodel.json')
 
     # Test the model
     with open("s2qdata/test_set.json", "r") as f:
