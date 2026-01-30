@@ -21,26 +21,26 @@
     },
     {
         "input" : "Calculate traction field from the uploaded bead images",
-        "output" :{"image": ["bead image previous", "bead image next"], "calculate": "traction", "array" : null}
+        "output" : {"image" : ["bead image previous", "bead image next"], "calculate": "traction", "array" : null}
     },
     {
         "input" : "Calculate traction field from the two bead images",
-        "output" :{"image": ["bead image previous", "bead image next"], "calculate": "traction", "array" : null}
+        "output" : {"image" : ["bead image previous", "bead image next"], "calculate": "traction", "array" : null}
     },
     {
         "input" : "Calculate traction field from with previous bead as beadbefore.png and after bead as beadafter.png",
-        "output" :{"image": ["bead image previous", "bead image next"], "calculate": "traction", "array" : null}
+        "output" : {"image" : ["bead image previous", "bead image next"], "calculate": "traction", "array" : null}
     },
     {
         "input" : "Calculate displacement field from the uploaded bead images",
-        "output" :{"image": ["bead image previous", "bead image next"], "calculate": "displacement", "array" : null}
+        "output" : {"image" : ["bead image previous", "bead image next"], "calculate": "displacement", "array" : null}
     },
     {
         "input" : "Calculate displacement field from the two bead images",
-        "output" :{"image": ["bead image previous", "bead image next"], "calculate": "displacement", "array" : null}
+        "output" : {"image" : ["bead image previous", "bead image next"], "calculate": "displacement", "array" : null}
     },
     {
         "input" : "Calculate displacement field from with previous bead as beadbefore.png and after bead as beadafter.png",
-        "output" :{"image": ["bead image previous", "bead image next"], "calculate": "displacement", "array" : null}
+        "output" : {"image" : ["bead image previous", "bead image next"], "calculate": "displacement", "array" : null}
     }
 ]

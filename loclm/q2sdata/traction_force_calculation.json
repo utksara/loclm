@@ -1,6 +1,74 @@
 [
     {
         "input": {
+            "image": [
+                "bead image before",
+                "bead image after"
+            ],
+            "calculate": "traction force"
+        },
+        "output": [
+            "image process beads",
+            "calculate traction"
+        ]
+    },
+    {
+        "input": {
+            "image": [
+                "cell image",
+                "bead image previous",
+                "bead image next"
+            ],
+            "calculate": "traction"
+        },
+        "output": [
+            "image process beads",
+            "calculate boundary",
+            "constrain displacement",
+            "calculate traction"
+        ]
+    },
+    {
+        "input": {
+            "image": [
+                "bead image previous",
+                "bead image next"
+            ],
+            "calculate": "traction"
+        },
+        "output": [
+            "image process beads",
+            "calculate traction"
+        ]
+    },
+    {
+        "input": {
+            "image": [
+                "bead image before",
+                "bead image after"
+            ],
+            "calculate": "traction"
+        },
+        "output": [
+            "image process beads",
+            "calculate traction"
+        ]
+    },
+    {
+        "input": {
+            "image": [
+                "bead image previous",
+                "bead image next"
+            ],
+            "calculate": "traction"
+        },
+        "output": [
+            "image process beads",
+            "calculate traction"
+        ]
+    },
+    {
+        "input": {
             "array": [
                 "displacement"
             ],
@@ -12,53 +80,23 @@
     },
     {
         "input": {
-            "image": [
-                "bead image previous",
-                "bead image next"
+            "array": [
+                "displacement array"
             ],
             "calculate": "traction"
         },
         "output": [
-            "image process beads",
             "calculate traction"
         ]
     },
     {
         "input": {
-            "image": [
-                "bead image before",
-                "bead image after"
+            "array": [
+                "displacement field"
             ],
             "calculate": "traction"
         },
         "output": [
-            "image process beads",
-            "calculate traction"
-        ]
-    },
-    {
-        "input": {
-            "image": [
-                "bead image previous",
-                "bead image after"
-            ],
-            "calculate": "traction"
-        },
-        "output": [
-            "image process beads",
-            "calculate traction"
-        ]
-    },
-    {
-        "input": {
-            "image": [
-                "bead image before",
-                "bead image next"
-            ],
-            "calculate": "traction"
-        },
-        "output": [
-            "image process beads",
             "calculate traction"
         ]
     }

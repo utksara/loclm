@@ -149,7 +149,9 @@ class FastKernelRouter:
 # --- Setup Data ---
 
 if __name__ == "__main__":
-    token_set = ["traction", "bead image previous", "bead image next", "displacement", "bead image", "from", "the", "with", "as", "and", "provided", "uploaded"]
+    with open("tokens.json", "r") as f:
+        token_set = json.load(f)
+    # token_set = ["traction", "bead image previous", "bead image next", "displacement", "bead image", "from", "the", "with", "as", "and", "provided", "uploaded"]
     prefix_set = ["image", "array", "calculate"]
     
     

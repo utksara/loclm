@@ -1,0 +1,48 @@
+[
+    {
+        "input": {
+            "image": [
+                "cell image"
+            ],
+            "calculate": "cell boundary"
+        },
+        "output": [
+            "calculate boundary"
+        ]
+    },
+    {
+        "input": {
+            "array": [
+                "bead image previous",
+                "bead image next"
+            ],
+            "calculate": "displacement"
+        },
+        "output": [
+            "image process beads"
+        ]
+    },
+    {
+        "input": {
+            "image": [
+                "displacement field"
+            ],
+            "calculate": "displacement"
+        },
+        "output": [
+            "image process heatmap"
+        ]
+    },
+    {
+        "input": {
+            "image": [
+                "cell image 1",
+                "cell image 2"
+            ],
+            "calculate": "merged images"
+        },
+        "output": [
+            "merge cell images"
+        ]
+    }
+]
