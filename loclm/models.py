@@ -1,5 +1,6 @@
 from loclm.query2sequence import *
 from loclm.sentence2query import *
+from importlib import resources
 import json
 class Model():
     def __init__(self):
